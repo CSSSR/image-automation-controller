@@ -35,6 +35,7 @@ import (
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	kuberecorder "k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -316,7 +317,15 @@ func (r *ImageUpdateAutomationReconciler) Reconcile(ctx context.Context, req ctr
 		// policies in the same namespace (maybe in the future this
 		// could be filtered by the automation object).
 		var policies imagev1_reflect.ImagePolicyList
-		if err := r.List(ctx, &policies, &client.ListOptions{Namespace: req.NamespacedName.Namespace}); err != nil {
+
+		policySelector := labels.Everything()
+		if auto.Spec.PolicySelector != nil {
+			if policySelector, err = metav1.LabelSelectorAsSelector(auto.Spec.PolicySelector); err != nil {
+				return failWithError(err)
+			}
+		}
+
+		if err := r.List(ctx, &policies, &client.ListOptions{Namespace: req.NamespacedName.Namespace, LabelSelector: policySelector}); err != nil {
 			return failWithError(err)
 		}
 
