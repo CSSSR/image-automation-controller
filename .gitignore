@@ -3,6 +3,7 @@ notes
 # Thes are downloaded in the Makefile
 cache/*
 internal/controller/testdata/crds/*
+.tmp/
 
 # Binaries for programs and plugins
 *.exe

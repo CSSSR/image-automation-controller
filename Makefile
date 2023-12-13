@@ -226,6 +226,8 @@ fuzz-native:
 define go-install-tool
 @[ -f $(1) ] || { \
 set -e ;\
+export TMPDIR="$$PWD/.tmp" ;\
+mkdir -p $$TMPDIR ;\
 TMP_DIR=$$(mktemp -d) ;\
 cd $$TMP_DIR ;\
 go mod init tmp ;\
